@@ -1,4 +1,4 @@
-pub mod test_objects {
+pub mod objects {
     use sfml::graphics::{CircleShape, RenderWindow, RenderTarget, Transformable, Shape, Color, RectangleShape};
     use sfml::system::Vector2f;
 
@@ -56,47 +56,42 @@ pub mod test_objects {
     }
 }
 
-#[cfg(test)]
-mod tests {
+use sfml::{
+    graphics::{Color, RenderWindow, RenderTarget},
+    window::{Style, Event, Key},
+};
 
-    use sfml::{
-        graphics::{Color, RenderWindow, RenderTarget},
-        window::{Style, Event, Key},
-    };
+use crate::object_handler::ObjectHandler;
+use crate::objects::Circle;
+use crate::objects::Square;
 
-    use crate::object_handler::ObjectHandler;
-    use crate::test_objects::Circle;
-    use crate::test_objects::Square;
+fn main() {
+    let mut window = RenderWindow::new(
+        (1920, 1080),
+        "SFML window",
+        Style::CLOSE,
+        &Default::default()
+    );
 
-    #[test]
-    fn run_system() {
-        let mut window = RenderWindow::new(
-            (1920, 1080),
-            "SFML window",
-            Style::CLOSE,
-            &Default::default()
-        );
+    let mut obj = ObjectHandler::new();
+    obj.import_object(Box::new(Square::new()));
+    obj.import_object(Box::new(Square::new()));
+    obj.import_object(Box::new(Circle::new()));
+    obj.import_object(Box::new(Circle::new()));
+    //obj.import_object(RectangleShape::new_init(Vector2f::new(32.0, 32.0)));
 
-        let mut obj = ObjectHandler::new();
-        obj.import_object(Box::new(Square::new()));
-        obj.import_object(Box::new(Square::new()));
-        obj.import_object(Box::new(Circle::new()));
-        obj.import_object(Box::new(Circle::new()));
-        //obj.import_object(RectangleShape::new_init(Vector2f::new(32.0, 32.0)));
+    while window.is_open() {
 
-        while window.is_open() {
-
-            while let Some(event) = window.poll_event() {
-                match event {
-                    Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => window.close(),
-                    _ => {}
-                }
+        while let Some(event) = window.poll_event() {
+            match event {
+                Event::Closed | Event::KeyPressed { code: Key::Escape, .. } => window.close(),
+                _ => {}
             }
-
-            window.clear(Color::BLACK);
-            obj.draw_all(&mut window);
-            window.display();
         }
+
+        window.clear(Color::BLACK);
+        obj.draw_all(&mut window);
+        window.display();
     }
 }
 
@@ -106,7 +101,7 @@ pub mod object_handler {
         window::{Event},
     };
 
-    use crate::test_objects::*;
+    use crate::objects::*;
 
     pub trait TDraw {
         fn draw(&self, window: &mut RenderWindow);
